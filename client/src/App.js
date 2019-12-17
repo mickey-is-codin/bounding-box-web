@@ -4,7 +4,13 @@ import './index.css';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { apiResponse: "" };
+    this.state = {
+      apiResponse: "",
+      imgPaths: []
+    };
+
+    this.callAPI = this.callAPI.bind(this);
+    this.getHeatmaps = this.getHeatmaps.bind(this);
   }
 
   callAPI() {
@@ -14,16 +20,38 @@ class App extends React.Component {
       .catch(err => err);
   }
 
+  getHeatmaps() {
+    fetch("http://localhost:9000/heatmaps")
+      .then(response => response.json())
+      .then(data => {
+        const paths = data;
+        this.setState({imgPaths: paths});
+      })
+      .catch(err => err);
+  }
+
   componentDidMount() {
     this.callAPI();
-    console.log(this.state.apiResponse);
+    this.getHeatmaps();
   }
 
   render() {
+
+    var imgPaths = this.state.imgPaths;
+    const imgPathList = imgPaths.map((path) =>
+      <li>{path}</li>
+    );
+
     return (
       <div id="mainContainer" className="container-fluid">
         <div className="row">
           <div id="leftContainer" className="col-8">
+            <p>
+              {this.state.apiResponse}
+            </p>
+            <ul>
+              {imgPathList}
+            </ul>
           </div>
           <div id="rightContainer" className="col-4">
             <div id="textboxRow" className="row my-4 align-middle">
