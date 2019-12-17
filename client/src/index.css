@@ -18,3 +18,15 @@ body {
     background-color: #D37887;
     height: 100vh;
 }
+
+#textbox {
+    width: 100%;
+}
+
+#resetButton {
+    width: 100%;
+}
+
+#submitButton {
+    width: 100%;
+}
