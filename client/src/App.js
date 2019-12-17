@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.css';
 
 class App extends React.Component {
   constructor(props) {
@@ -21,9 +22,12 @@ class App extends React.Component {
   render() {
     return (
       <div id="mainContainer" className="container-fluid">
-        <p>
-          {this.state.apiResponse}
-        </p>
+        <div className="row">
+          <div id="leftContainer" className="col">
+          </div>
+          <div id="rightContainer" className="col">
+          </div>
+        </div>
       </div>
     );
   }
