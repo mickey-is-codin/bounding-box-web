@@ -33,22 +33,13 @@ class App extends React.Component {
       .catch(err => err);
   }
 
-  shuffleArray(array) {
-    for (var i=array.length-1; i>0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
-    }
-  }
-
   getHeatmaps() {
 
     const dataRoot = 'http://localhost:3000/img/avg-heatmaps/'
     fetch("http://localhost:9000/heatmaps")
       .then(response => response.json())
       .then(data => {
-        const paths = data.map((path) =>
+        var paths = data.map((path) =>
           dataRoot.concat(path)
         );
         this.setState({imgPaths: paths}, function() {
@@ -56,7 +47,6 @@ class App extends React.Component {
         });
       })
       .catch(err => err);
-
   }
 
   makeAnnotator() {
@@ -93,8 +83,7 @@ class App extends React.Component {
 
     console.log("Submit pressed");
 
-    var currIx = this.state.imgIx;
-    this.setState({imgIx: ++currIx}, function() {
+    this.setState({imgIx: Math.floor(Math.random() * Math.floor(this.state.imgPaths.length))}, function() {
       console.log("Image Index is now: " + this.state.imgIx);
 
       this.annotator.clear_all();
