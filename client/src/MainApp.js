@@ -126,12 +126,11 @@ class MainApp extends React.Component {
       "bbox": this.state.bbox
     }
 
-    const response = fetch('http://localhost:9000/storeBBox', {
+    fetch('http://localhost:9000/storeBBox', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload)
     });
-    console.log(response);
   }
 
   render() {

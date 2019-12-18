@@ -42,6 +42,7 @@ router.post('/', function(req, res) {
         }
         console.log("Filename " + bbox.filename + " saved to bboxes collection")
       });
+
       res.send("Great success");
     });
 });
