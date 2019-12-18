@@ -1,18 +1,14 @@
-import mongoose from 'mongoose';
+var mongoose = require('mongoose');
 
-const bboxSchema = new mongoose.Schema({
-    filename: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    bbox: {
-        type: Object,
-        unique: false,
-        required: true
-    }
+var BBoxSchema = new mongoose.Schema({
+  filename: String,
+  bbox: {
+    left: Number,
+    top: Number,
+    width: Number,
+    height: Number
+  }
 });
 
-const BBox = mongoose.model('BBox', bboxSchema);
+module.exports = mongoose.model('BBox', BBoxSchema, "bboxCollection");
 
-export default BBox;

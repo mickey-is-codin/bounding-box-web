@@ -3,6 +3,8 @@ var fs = require('fs');
 var mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 
+var BBoxModel = require('../models/bbox');
+
 var router = express.Router();
 
 /* GET heatmap image paths */
@@ -32,19 +34,7 @@ router.post('/', function(req, res) {
     db.once('open', function() {
       console.log("MongoDB Connection Successful!");
 
-      var BBoxSchema = new mongoose.Schema({
-        filename: String,
-        bbox: {
-          left: Number,
-          top: Number,
-          width: Number,
-          height: Number
-        }
-      });
-
-      var BBox = mongoose.model('BBox', BBoxSchema, "bboxCollection");
-
-      var bboxReceived = new BBox(req.body);
+      var bboxReceived = new BBoxModel(req.body);
 
       bboxReceived.save(function(err, bbox) {
         if (err) {
