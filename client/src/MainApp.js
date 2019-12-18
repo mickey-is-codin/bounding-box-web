@@ -28,7 +28,14 @@ class MainApp extends React.Component {
         guide: false,
         onchange: null
       },
-      filename: "test filename"
+      filename: "test filename",
+      bbox: {
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        label: "sacral region"
+      }
     }
   }
 
@@ -60,6 +67,7 @@ class MainApp extends React.Component {
   }
 
   generateAnnotator() {
+    var self = this;
     var receivedTraits = {
       url: this.state.imgPaths[this.state.imgIx],
       input_method: 'fixed',
@@ -67,6 +75,7 @@ class MainApp extends React.Component {
       guide: true,
       onchange: function(entries) {
         $("#textbox").text(JSON.stringify(entries, null, "  "));
+        self.setState({bbox: entries[0]});
       }
     }
 
@@ -106,9 +115,23 @@ class MainApp extends React.Component {
     this.setState({
       imgIx: Math.floor(Math.random() * Math.floor(this.state.imgPaths.length))
     }, function() {
-        //this.sendBBoxPayload();
+        this.sendBBoxPayload();
         this.replaceAnnotator();
     });
+  }
+
+  sendBBoxPayload() {
+    var payload = {
+      "filename": this.state.filename,
+      "bbox": this.state.bbox
+    }
+
+    const response = fetch('http://localhost:9000/storeBBox', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    console.log(response);
   }
 
   render() {

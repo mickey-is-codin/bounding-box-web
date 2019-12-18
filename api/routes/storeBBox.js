@@ -1,5 +1,7 @@
 var express = require('express');
 var fs = require('fs');
+var mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
 
 var router = express.Router();
 
@@ -17,8 +19,41 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res) {
-    console.log(req.body);
-    res.send(req.body);
+
+    mongoose.connect('mongodb://localhost:27017/bboxes', {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    });
+
+    var db = mongoose.connection;
+
+    db.on('error', console.error.bind(console, 'connection error: '));
+
+    db.once('open', function() {
+      console.log("MongoDB Connection Successful!");
+
+      var BBoxSchema = new mongoose.Schema({
+        filename: String,
+        bbox: {
+          left: Number,
+          top: Number,
+          width: Number,
+          height: Number
+        }
+      });
+
+      var BBox = mongoose.model('BBox', BBoxSchema, "bboxCollection");
+
+      var bboxReceived = new BBox(req.body);
+
+      bboxReceived.save(function(err, bbox) {
+        if (err) {
+          return(console.error(err));
+        }
+        console.log("Filename " + bbox.filename + " saved to bboxes collection")
+      });
+      res.send("Great success");
+    });
 });
 
 module.exports = router;
