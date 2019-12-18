@@ -1,17 +1,27 @@
 import React from 'react';
 import './index.css';
 
+import $ from 'jquery';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       apiResponse: "",
       imgPaths: [],
-      imgIx: 0
+      imgIx: 0,
+      annotatorTraits: {
+        url: "",
+        input_method: "",
+        labels: "",
+        guide: false,
+        onchange: null
+      }
     };
 
     this.callAPI = this.callAPI.bind(this);
     this.getHeatmaps = this.getHeatmaps.bind(this);
+    this.handleReset = this.handleReset.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -23,19 +33,69 @@ class App extends React.Component {
   }
 
   getHeatmaps() {
+
+    const dataRoot = 'http://localhost:3000/img/avg-heatmaps/'
     fetch("http://localhost:9000/heatmaps")
       .then(response => response.json())
       .then(data => {
-        const paths = data;
-        this.setState({imgPaths: paths});
+        const paths = data.map((path) =>
+          dataRoot.concat(path)
+        );
+        this.setState({imgPaths: paths}, function() {
+          this.makeAnnotator();
+        });
       })
       .catch(err => err);
+
+  }
+
+  makeAnnotator() {
+
+    console.log("Updating annotator on page");
+
+    var receivedTraits = {
+      url: this.state.imgPaths[this.state.imgIx],
+      input_method: 'fixed',
+      labels: "sacral region",
+      guide: true,
+      onchange: function(entries) {
+        $("#textbox").text(JSON.stringify(entries, null, "  "));
+      }
+    }
+
+    console.log("Annotator URL being updated to: " + receivedTraits.url);
+
+    this.setState({annotatorTraits: receivedTraits}, function() {
+      console.log("State annotator URL is now: " + this.state.annotatorTraits.url);
+      this.annotator = new window.BBoxAnnotator(this.state.annotatorTraits);
+    });
+
+  }
+
+  handleReset() {
+    this.annotator.clear_all();
   }
 
   handleSubmit() {
+
+    console.log("Submit pressed");
+
     var currIx = this.state.imgIx;
-    this.setState({imgIx: ++currIx})
-    console.log(this.state.imgIx);
+    this.setState({imgIx: ++currIx}, function() {
+      console.log("Image Index is now: " + this.state.imgIx);
+
+      this.annotator.clear_all();
+
+      var oldBBoxElem = document.getElementById('bbox_annotator');
+      var bboxParent = oldBBoxElem.parentNode;
+      bboxParent.removeChild(oldBBoxElem);
+
+      var newBBoxElem = document.createElement('div');
+      newBBoxElem.setAttribute('id', 'bbox_annotator');
+      bboxParent.appendChild(newBBoxElem);
+      this.makeAnnotator();
+    });
+
   }
 
   componentDidMount() {
@@ -45,14 +105,9 @@ class App extends React.Component {
 
   render() {
 
-    const dataRoot = 'http://localhost:3000/img/avg-heatmaps/'
-    var imgPaths = this.state.imgPaths;
-    const imgPathList = imgPaths.map((path) =>
-      <li>{dataRoot.concat(path)}</li>
-    );
-    const imgPathTags = imgPaths.map((path) =>
-      <img src={dataRoot.concat(path)} alt="heatmap"/>
-    );
+    // const imgPathTags = this.state.imgPaths.map((path) =>
+    //   <img src={path} alt="heatmap"/>
+    // );
 
     return (
       <div id="mainContainer" className="container-fluid">
@@ -65,9 +120,10 @@ class App extends React.Component {
                 </p>
               </div>
             </div>
-            <div id="heatmapImgRow" className="row my-4 align-middle">
-              <div id="heatmapImgCol" className="col d-flex justify-content-around">
-                {imgPathTags[this.state.imgIx]}
+            <div id="annotatorRow" className="row my-4 align-middle">
+              <div id="annotatorCol" className="col d-flex justify-content-around">
+                <div id="bbox_annotator">
+                </div>
               </div>
             </div>
           </div>
@@ -85,7 +141,7 @@ class App extends React.Component {
             </div>
             <div id="buttonsRow" className="row my-4 align-middle">
               <div id="resetButtonCol" className="col d-flex justify-content-around">
-                <button id="resetButton" className="btn-lg btn-primary">
+                <button id="resetButton" className="btn-lg btn-primary" onClick={this.handleReset}>
                   Reset Bounding Box
                 </button>
               </div>
