@@ -37,21 +37,31 @@ class App extends React.Component {
 
   render() {
 
+    const dataRoot = 'http://localhost:3000/img/avg-heatmaps/'
     var imgPaths = this.state.imgPaths;
     const imgPathList = imgPaths.map((path) =>
-      <li>{path}</li>
+      <li>{dataRoot.concat(path)}</li>
+    );
+    const imgPathTags = imgPaths.map((path) =>
+      <img src={dataRoot.concat(path)} alt="heatmap"/>
     );
 
     return (
       <div id="mainContainer" className="container-fluid">
-        <div className="row">
+        <div id="fullPageRow" className="row">
           <div id="leftContainer" className="col-8">
-            <p>
-              {this.state.apiResponse}
-            </p>
-            <ul>
-              {imgPathList}
-            </ul>
+            <div id="apiTestRow" className="row my-4 align-middle">
+              <div id="apiTestCol" className="col d-flex justify-content-around">
+                <p>
+                  {this.state.apiResponse}
+                </p>
+              </div>
+            </div>
+            <div id="heatmapImgRow" className="row my-4 align-middle">
+              <div id="heatmapImgCol" className="col d-flex justify-content-around">
+                {imgPathTags[0]}
+              </div>
+            </div>
           </div>
           <div id="rightContainer" className="col-4">
             <div id="textboxRow" className="row my-4 align-middle">

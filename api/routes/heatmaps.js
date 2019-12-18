@@ -7,7 +7,7 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
 
     var heatmapPaths = [];
-    const heatmapDir = 'data/avg-heatmaps';
+    const heatmapDir = '../client/public/img/avg-heatmaps';
 
     fs.readdirSync(heatmapDir).forEach(file => {
         heatmapPaths.push(file);
