@@ -7,7 +7,11 @@ class App extends React.Component {
     this.state = {
       apiResponse: "",
       imgPaths: [],
-      imgIx: 0
+      imgIx: 0,
+      top: 0,
+      left: 0,
+      height: 0,
+      width: 0
     };
 
     this.callAPI = this.callAPI.bind(this);
