@@ -16,7 +16,8 @@ class App extends React.Component {
         labels: "",
         guide: false,
         onchange: null
-      }
+      },
+      filename: "test filename"
     };
 
     this.callAPI = this.callAPI.bind(this);
@@ -30,6 +31,15 @@ class App extends React.Component {
       .then(res => res.text())
       .then(res => this.setState({ apiResponse: res }))
       .catch(err => err);
+  }
+
+  shuffleArray(array) {
+    for (var i=array.length-1; i>0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
   }
 
   getHeatmaps() {
@@ -68,6 +78,9 @@ class App extends React.Component {
     this.setState({annotatorTraits: receivedTraits}, function() {
       console.log("State annotator URL is now: " + this.state.annotatorTraits.url);
       this.annotator = new window.BBoxAnnotator(this.state.annotatorTraits);
+      var splitURL = receivedTraits.url.split("/");
+      var newFilename = splitURL[splitURL.length - 1].split(".")[0];
+      this.setState({filename: newFilename});
     });
 
   }
@@ -113,11 +126,18 @@ class App extends React.Component {
       <div id="mainContainer" className="container-fluid">
         <div id="fullPageRow" className="row">
           <div id="leftContainer" className="col-8">
-            <div id="apiTestRow" className="row my-4 align-middle">
+            <div id="apiTestRow" className="row my-2 align-middle">
               <div id="apiTestCol" className="col d-flex justify-content-around">
                 <p>
                   {this.state.apiResponse}
                 </p>
+              </div>
+            </div>
+            <div id="filenameRow" className="row my-2 align-middle">
+              <div id="filenameCol" className="col d-flex justify-content-around">
+                <h2>
+                  {this.state.filename}
+                </h2>
               </div>
             </div>
             <div id="annotatorRow" className="row my-4 align-middle">
