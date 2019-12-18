@@ -6,11 +6,13 @@ class App extends React.Component {
     super(props);
     this.state = {
       apiResponse: "",
-      imgPaths: []
+      imgPaths: [],
+      imgIx: 0
     };
 
     this.callAPI = this.callAPI.bind(this);
     this.getHeatmaps = this.getHeatmaps.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   callAPI() {
@@ -28,6 +30,12 @@ class App extends React.Component {
         this.setState({imgPaths: paths});
       })
       .catch(err => err);
+  }
+
+  handleSubmit() {
+    var currIx = this.state.imgIx;
+    this.setState({imgIx: ++currIx})
+    console.log(this.state.imgIx);
   }
 
   componentDidMount() {
@@ -59,7 +67,7 @@ class App extends React.Component {
             </div>
             <div id="heatmapImgRow" className="row my-4 align-middle">
               <div id="heatmapImgCol" className="col d-flex justify-content-around">
-                {imgPathTags[0]}
+                {imgPathTags[this.state.imgIx]}
               </div>
             </div>
           </div>
@@ -77,13 +85,13 @@ class App extends React.Component {
             </div>
             <div id="buttonsRow" className="row my-4 align-middle">
               <div id="resetButtonCol" className="col d-flex justify-content-around">
-                <button id="resetButton" className="btn btn-primary">
-                  Reset
+                <button id="resetButton" className="btn-lg btn-primary">
+                  Reset Bounding Box
                 </button>
               </div>
               <div id="submitButtonCol" className="col d-flex justify-content-around">
-                <button id="submitButton" className="btn btn-success">
-                  Success
+                <button id="submitButton" className="btn-lg btn-success" onClick={this.handleSubmit}>
+                  Submit Bounding Box
                 </button>
               </div>
             </div>
