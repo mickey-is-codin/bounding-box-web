@@ -14,7 +14,6 @@ class MainApp extends React.Component {
     this.callAPI = this.callAPI.bind(this);
     this.getHeatmaps = this.getHeatmaps.bind(this);
 
-    this.handleAnnotatorChange = this.handleAnnotatorChange.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 
@@ -54,13 +53,13 @@ class MainApp extends React.Component {
           dataRoot.concat(path)
         );
         this.setState({imgPaths: paths}, function() {
-          this.makeAnnotator();
+          this.generateAnnotator();
         });
       })
       .catch(err => err);
   }
 
-  makeAnnotator() {
+  generateAnnotator() {
     var receivedTraits = {
       url: this.state.imgPaths[this.state.imgIx],
       input_method: 'fixed',
@@ -79,8 +78,24 @@ class MainApp extends React.Component {
     });
   }
 
-  handleAnnotatorChange(traits) {
-    this.annotator = new window.BBoxAnnotator(traits);
+  replaceAnnotator() {
+    this.annotator.clear_all();
+    var bboxParent = this.destroyAnnotator();
+    this.newAnnotatorElement(bboxParent);
+  }
+
+  destroyAnnotator() {
+    var oldBBoxElem = document.getElementById('bbox_annotator');
+    var bboxParent = oldBBoxElem.parentNode;
+    bboxParent.removeChild(oldBBoxElem);
+    return(bboxParent);
+  }
+
+  newAnnotatorElement(bboxParent) {
+    var newBBoxElem = document.createElement('div');
+    newBBoxElem.setAttribute('id', 'bbox_annotator');
+    bboxParent.appendChild(newBBoxElem);
+    this.generateAnnotator();
   }
 
   handleReset() {
@@ -90,17 +105,7 @@ class MainApp extends React.Component {
   handleSubmit() {
     this.setState({
       imgIx: Math.floor(Math.random() * Math.floor(this.state.imgPaths.length))}, function() {
-
-      this.annotator.clear_all();
-
-      var oldBBoxElem = document.getElementById('bbox_annotator');
-      var bboxParent = oldBBoxElem.parentNode;
-      bboxParent.removeChild(oldBBoxElem);
-
-      var newBBoxElem = document.createElement('div');
-      newBBoxElem.setAttribute('id', 'bbox_annotator');
-      bboxParent.appendChild(newBBoxElem);
-      this.makeAnnotator();
+      this.replaceAnnotator();
     });
   }
 
@@ -108,27 +113,17 @@ class MainApp extends React.Component {
     return(
       <div id="mainContainer" className="container-fluid">
         <div id="fullPageRow" className="row">
-          <div id="leftContainer" className="col-8">
           <Annotator
-            makeAnnotator={this.makeAnnotator}
-            onNewAnnotator={this.handleNewAnnotator}
-            annotator={this.annotator}
             apiResponse={this.state.apiResponse}
             filename={this.state.filename}
-            imgIx={this.state.imgIx}
           />
-          </div>
           <div id="rightContainer" className="col-4">
             <Textbox/>
             <div id="buttonsRow" className="row my-4 align-middle">
               <ResetButton
-                onNewAnnotator={this.handleNewAnnotator}
-                annotator={this.annotator}
                 onReset={this.handleReset}
               />
               <SubmitButton
-                onNewAnnotator={this.handleNewAnnotator}
-                annotator={this.annotator}
                 onSubmit={this.handleSubmit}
               />
             </div>

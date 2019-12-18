@@ -2,13 +2,6 @@ import React from 'react';
 import '../index.css';
 
 class Textbox extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      message: props.thing
-    }
-  }
 
   render() {
     return(
