@@ -104,8 +104,10 @@ class MainApp extends React.Component {
 
   handleSubmit() {
     this.setState({
-      imgIx: Math.floor(Math.random() * Math.floor(this.state.imgPaths.length))}, function() {
-      this.replaceAnnotator();
+      imgIx: Math.floor(Math.random() * Math.floor(this.state.imgPaths.length))
+    }, function() {
+        //this.sendBBoxPayload();
+        this.replaceAnnotator();
     });
   }
 
