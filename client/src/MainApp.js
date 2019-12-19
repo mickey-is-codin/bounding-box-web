@@ -12,7 +12,7 @@ class MainApp extends React.Component {
   constructor() {
     super();
 
-    // Binding Methods
+    // Bind Methods
     this.callAPI = this.callAPI.bind(this);
     this.getHeatmaps = this.getHeatmaps.bind(this);
     this.handleReset = this.handleReset.bind(this);
@@ -55,6 +55,7 @@ class MainApp extends React.Component {
 
   getHeatmaps() {
     const dataRoot = 'http://localhost:3000/img/avg-heatmaps/'
+
     fetch("http://localhost:9000/heatmaps")
       .then(response => response.json())
       .then(data => {
@@ -69,8 +70,19 @@ class MainApp extends React.Component {
   }
 
   generateAnnotator() {
+    var newTraits = this.buildAnnotatorTraits();
+
+    this.setState({annotatorTraits: newTraits}, function() {
+      this.annotator = new window.BBoxAnnotator(this.state.annotatorTraits);
+      var splitURL = newTraits.url.split("/");
+      var newFilename = splitURL[splitURL.length - 1].split(".")[0];
+      this.setState({filename: newFilename});
+    });
+  }
+
+  buildAnnotatorTraits() {
     var self = this;
-    var receivedTraits = {
+    return({
       url: this.state.imgPaths[this.state.imgIx],
       input_method: 'fixed',
       labels: "sacral region",
@@ -79,20 +91,12 @@ class MainApp extends React.Component {
         $("#textbox").text(JSON.stringify(entries, null, "  "));
         self.setState({bbox: entries[0]});
       }
-    }
-
-    this.setState({annotatorTraits: receivedTraits}, function() {
-      this.annotator = new window.BBoxAnnotator(this.state.annotatorTraits);
-      var splitURL = receivedTraits.url.split("/");
-      var newFilename = splitURL[splitURL.length - 1].split(".")[0];
-      this.setState({filename: newFilename});
     });
   }
 
   replaceAnnotator() {
     this.annotator.clear_all();
-    var bboxParent = this.destroyAnnotatorElem();
-    this.regenAnnotatorElem(bboxParent);
+    this.regenAnnotatorElem(this.destroyAnnotatorElem());
   }
 
   destroyAnnotatorElem() {
