@@ -12,7 +12,6 @@ class Textbox extends React.Component {
             rows="20"
             placeholder="Your coordinates will show up here..."
             readOnly>
-
           </textarea>
         </div>
       </div>

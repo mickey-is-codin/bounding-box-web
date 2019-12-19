@@ -11,12 +11,14 @@ class MainApp extends React.Component {
 
   constructor() {
     super();
+
+    // Binding Methods
     this.callAPI = this.callAPI.bind(this);
     this.getHeatmaps = this.getHeatmaps.bind(this);
-
     this.handleReset = this.handleReset.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 
+    // State Initialization
     this.state = {
       apiResponse: "",
       imgPaths: [],
@@ -89,18 +91,18 @@ class MainApp extends React.Component {
 
   replaceAnnotator() {
     this.annotator.clear_all();
-    var bboxParent = this.destroyAnnotator();
-    this.newAnnotatorElement(bboxParent);
+    var bboxParent = this.destroyAnnotatorElem();
+    this.regenAnnotatorElem(bboxParent);
   }
 
-  destroyAnnotator() {
+  destroyAnnotatorElem() {
     var oldBBoxElem = document.getElementById('bbox_annotator');
     var bboxParent = oldBBoxElem.parentNode;
     bboxParent.removeChild(oldBBoxElem);
     return(bboxParent);
   }
 
-  newAnnotatorElement(bboxParent) {
+  regenAnnotatorElem(bboxParent) {
     var newBBoxElem = document.createElement('div');
     newBBoxElem.setAttribute('id', 'bbox_annotator');
     bboxParent.appendChild(newBBoxElem);
@@ -144,12 +146,8 @@ class MainApp extends React.Component {
           <div id="rightContainer" className="col-4">
             <Textbox/>
             <div id="buttonsRow" className="row my-4 align-middle">
-              <ResetButton
-                onReset={this.handleReset}
-              />
-              <SubmitButton
-                onSubmit={this.handleSubmit}
-              />
+              <ResetButton onReset={this.handleReset}/>
+              <SubmitButton onSubmit={this.handleSubmit}/>
             </div>
           </div>
         </div>
