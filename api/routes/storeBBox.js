@@ -7,19 +7,6 @@ var BBoxModel = require('../models/bbox');
 
 var router = express.Router();
 
-/* GET heatmap image paths */
-router.get('/', function(req, res, next) {
-
-    var heatmapPaths = [];
-    const heatmapDir = '../client/public/img/avg-heatmaps';
-
-    fs.readdirSync(heatmapDir).forEach(file => {
-        heatmapPaths.push(file);
-    });
-
-    res.json(heatmapPaths);
-});
-
 router.post('/', function(req, res) {
 
     mongoose.connect('mongodb://localhost:27017/bboxes', {
@@ -28,19 +15,37 @@ router.post('/', function(req, res) {
     });
 
     var db = mongoose.connection;
-
     db.on('error', console.error.bind(console, 'connection error: '));
-
     db.once('open', function() {
       console.log("MongoDB Connection Successful!");
 
-      var bboxReceived = new BBoxModel(req.body);
+      var insertObject = {
+        filename: req.body.filename,
+        bboxes: [req.body.bbox]
+      }
 
-      bboxReceived.save(function(err, bbox) {
-        if (err) {
-          return(console.error(err));
+      BBoxModel.findOne({filename: req.body.filename}, function(err, matches) {
+        console.log(req.body.bbox);
+        if (matches) {
+          console.log("Pushing onto array");
+          BBoxModel.update(
+            { filename: req.body.filename},
+            { $push: {bboxes: req.body.bbox} },
+            function(err, result) {
+              if (err) {
+                console.log(err);
+              }
+            }
+          );
+        } else {
+          console.log("Making new DB entry");
+          var bboxReceived = new BBoxModel(insertObject);
+          bboxReceived.save(function(err, bbox) {
+            if (err) {
+              return(console.error(err));
+            }
+          });
         }
-        console.log("Filename " + bbox.filename + " saved to bboxes collection")
       });
 
       res.send("Great success");
